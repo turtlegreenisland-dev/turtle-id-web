@@ -2,7 +2,7 @@
 const APP_CONFIG = {
   // Apps Script Web App URL（部署後從 Apps Script「部署 → 管理部署」取得）
   // 範例：https://script.google.com/macros/s/AKfycbxxxxxxxxxxxxxxx/exec
-  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwaqpXbKn67MRHnl_tne6ApZ2A3wev6YfyPharxs18gVS6rdF5cUYsPbXxfLDHl34-Q/exec',
+  APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxXsk95kbS3rEXHHY3NsbPUo6yHYR7rFgkVJuuYyKVyZEYXWqfTiSJDqLosm6ft54lm/exec',
 
   // 一般回報的 request token，要與 Script Properties 的 REQUEST_TOKEN 一致
   REQUEST_TOKEN: '433e331ad318d96f893f139630095aff',
