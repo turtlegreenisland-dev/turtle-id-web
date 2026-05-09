@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理 — 海龜辨識系統</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="inner">
+      <h1><a href="index.html">海龜辨識系統</a></h1>
+      <nav class="site-nav">
+        <a href="index.html">回報</a>
+        <a href="search.html">查詢</a>
+        <a href="admin.html" class="active">管理</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- 登入區 -->
+    <div class="card" id="loginCard">
+      <h2>管理員登入</h2>
+      <p class="intro">請使用研究人員 Google 帳號登入。</p>
+      <div id="googleSignIn"></div>
+      <div id="loginAlert" style="margin-top:12px;"></div>
+    </div>
+
+    <!-- 登入後內容 -->
+    <div id="adminContent" style="display:none;">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div>已登入：<strong id="userEmail"></strong></div>
+          <button id="signOutBtn" class="btn btn-secondary">登出</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>系統狀態</h2>
+        <div id="systemStatus">
+          <p class="helper-text">載入中…</p>
+        </div>
+        <button id="refreshHealthBtn" class="btn btn-secondary" style="margin-top:8px;">重新整理</button>
+      </div>
+
+      <div class="card">
+        <h2>批量比對</h2>
+        <p class="intro">輸入待批量比對的 Google Drive 資料夾 ID（資料夾下需有「左側」「右側」子資料夾）。</p>
+        <div class="form-group">
+          <label for="batchFolderId">資料夾 ID</label>
+          <input type="text" id="batchFolderId" placeholder="例如 1abc...XYZ">
+        </div>
+        <button id="batchStartBtn" class="btn btn-primary">開始批量比對</button>
+        <div id="batchProgress" style="margin-top:14px;"></div>
+      </div>
+
+      <div class="card">
+        <h2>索引管理</h2>
+        <p class="intro">從資料庫資料夾全量重建索引（耗時數分鐘，僅在大量更動後使用）。</p>
+        <button id="rebuildBtn" class="btn btn-danger">重建索引</button>
+        <div id="rebuildAlert" style="margin-top:12px;"></div>
+      </div>
+
+      <div class="card">
+        <h2>最近 10 筆比對紀錄</h2>
+        <div id="recentRecords">
+          <p class="helper-text">載入中…</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    海龜辨識系統 · 個體再辨識（Re-ID）
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

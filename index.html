@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>海龜目擊回報 — 海龜辨識系統</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="inner">
+      <h1><a href="index.html">海龜辨識系統</a></h1>
+      <nav class="site-nav">
+        <a href="index.html" class="active">回報</a>
+        <a href="search.html">查詢</a>
+        <a href="admin.html">管理</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="card">
+      <h2>海龜目擊回報</h2>
+      <p class="intro">拍到海龜了嗎？上傳照片，AI 幫你辨識牠是誰！比對結果可在「查詢」頁用姓名查詢。</p>
+
+      <div id="alertBox"></div>
+
+      <form id="reportForm" novalidate>
+        <div class="form-group">
+          <label for="reporterName">姓名 <span class="required">*</span></label>
+          <input type="text" id="reporterName" name="name" maxlength="20" required>
+          <div class="helper-text">最多 20 字</div>
+        </div>
+
+        <div class="form-group">
+          <label for="locationSelect">地點 <span class="required">*</span></label>
+          <select id="locationSelect" required>
+            <option value="">請選擇</option>
+            <option value="小琉球花瓶岩">小琉球花瓶岩</option>
+            <option value="小琉球美人洞">小琉球美人洞</option>
+            <option value="小琉球杉福漁港">小琉球杉福漁港</option>
+            <option value="綠島石朗">綠島石朗</option>
+            <option value="綠島大白沙">綠島大白沙</option>
+            <option value="蘭嶼">蘭嶼</option>
+            <option value="澎湖">澎湖</option>
+            <option value="__OTHER__">其他（手動輸入）</option>
+          </select>
+          <input type="text" id="locationCustom" placeholder="請輸入地點" maxlength="50"
+                 style="display:none; margin-top:8px;">
+        </div>
+
+        <div class="form-group">
+          <label>照片上傳 <span class="required">*</span></label>
+          <label class="photo-upload" for="photoInput">
+            <input type="file" id="photoInput" accept="image/jpeg,image/png,image/heic,image/heif" multiple>
+            <p style="margin:0;"><strong>點此選擇照片</strong>（最多 5 張，每張 ≤ 10MB）</p>
+            <p class="helper-text" style="margin-top:6px;">支援 JPG / PNG / HEIC；每張需指定左側或右側</p>
+          </label>
+          <div id="photoList" class="photo-list"></div>
+        </div>
+
+        <button type="submit" id="submitBtn" class="btn btn-primary">送出回報</button>
+      </form>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    海龜辨識系統 · 個體再辨識（Re-ID）
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/report.js"></script>
+</body>
+</html>
