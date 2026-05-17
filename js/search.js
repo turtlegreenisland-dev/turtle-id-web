@@ -51,27 +51,33 @@
     return (idx >= 0 ? s.slice(0, idx) : s).trim();
   }
 
-  /** 把一筆回報的比對結果渲染成「最相似個體」或「可能為新個體」。 */
+  /** 渲染一筆回報的比對結果：最相似的前 3 個候選個體（輔助判斷用）。 */
   function renderMatch(r) {
     if (r.status && r.status !== '已完成') {
       return '<div class="match-box match-pending">比對' + escapeHtml(r.status) + '</div>';
     }
-    const top = (r.results || [])[0];
-    const score = parseScore(top);
-    if (!top || isNaN(score) || score < SIMILARITY_THRESHOLD) {
+    const top = (r.results || []).slice(0, 3);
+    if (top.length === 0) {
       return '<div class="match-box match-new">' +
-        '<div class="match-new-title">可能為新個體</div>' +
-        (isNaN(score) ? '' :
-          '<div class="match-score">最高相似度 ' + score.toFixed(2) +
-          '（門檻 ' + SIMILARITY_THRESHOLD + '）</div>') +
-        '</div>';
+        '<div class="match-new-title">尚無比對結果</div></div>';
     }
-    const id = parseIndividualId(top);
+    const bestScore = parseScore(top[0]);
+    const items = top.map(function (rk, idx) {
+      const id = parseIndividualId(rk);
+      const score = parseScore(rk);
+      return '<div class="cand-item" data-individual="' + escapeHtml(id) + '">' +
+        '<span class="cand-rank">' + (idx + 1) + '</span>' +
+        '<span class="cand-id">' + escapeHtml(id) + ' ›</span>' +
+        '<span class="cand-score">' +
+        (isNaN(score) ? '—' : '相似度 ' + score.toFixed(2)) + '</span>' +
+        '</div>';
+    }).join('');
+    const note = (isNaN(bestScore) || bestScore < SIMILARITY_THRESHOLD)
+      ? '<div class="cand-note">最高相似度偏低，可能為新個體</div>'
+      : '';
     return '<div class="match-box match-found">' +
-      '<div class="match-label">最相似個體（點編號看牠的其他照片）</div>' +
-      '<div class="match-id match-id-link" data-individual="' + escapeHtml(id) + '">' +
-      escapeHtml(id) + ' ›</div>' +
-      '<div class="match-score">相似度 ' + score.toFixed(2) + '</div>' +
+      '<div class="match-label">最相似的候選個體（點編號看牠的其他照片）</div>' +
+      items + note +
       '</div>';
   }
 
@@ -119,7 +125,7 @@
     });
 
     // 點個體編號 → 看該個體所有照片
-    els.results.querySelectorAll('.match-id-link').forEach(function (el) {
+    els.results.querySelectorAll('.cand-item').forEach(function (el) {
       el.addEventListener('click', function () {
         openIndividual(el.dataset.individual);
       });
