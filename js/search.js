@@ -12,7 +12,12 @@
     results: document.getElementById('resultsArea'),
     modal: document.getElementById('imageModal'),
     modalImg: document.getElementById('modalImage'),
-    modalClose: document.getElementById('modalClose')
+    modalClose: document.getElementById('modalClose'),
+    indModal: document.getElementById('individualModal'),
+    indClose: document.getElementById('individualClose'),
+    indTitle: document.getElementById('individualTitle'),
+    indMeta: document.getElementById('individualMeta'),
+    indPhotos: document.getElementById('individualPhotos')
   };
 
   function escapeHtml(s) {
@@ -61,9 +66,11 @@
           '（門檻 ' + SIMILARITY_THRESHOLD + '）</div>') +
         '</div>';
     }
+    const id = parseIndividualId(top);
     return '<div class="match-box match-found">' +
-      '<div class="match-label">最相似個體</div>' +
-      '<div class="match-id">' + escapeHtml(parseIndividualId(top)) + '</div>' +
+      '<div class="match-label">最相似個體（點編號看牠的其他照片）</div>' +
+      '<div class="match-id match-id-link" data-individual="' + escapeHtml(id) + '">' +
+      escapeHtml(id) + ' ›</div>' +
       '<div class="match-score">相似度 ' + score.toFixed(2) + '</div>' +
       '</div>';
   }
@@ -110,7 +117,72 @@
         els.modal.classList.add('show');
       });
     });
+
+    // 點個體編號 → 看該個體所有照片
+    els.results.querySelectorAll('.match-id-link').forEach(function (el) {
+      el.addEventListener('click', function () {
+        openIndividual(el.dataset.individual);
+      });
+    });
   }
+
+  // ---------- 個體照片檢視 ----------
+  function closeIndividual() {
+    els.indModal.classList.remove('show');
+    els.indPhotos.innerHTML = '';
+  }
+
+  async function openIndividual(individualId) {
+    if (!individualId) return;
+    els.indTitle.textContent = individualId;
+    els.indMeta.textContent = '載入中…';
+    els.indPhotos.innerHTML = '';
+    els.indModal.classList.add('show');
+    try {
+      const url = APP_CONFIG.APPS_SCRIPT_URL + '?individual=' + encodeURIComponent(individualId) +
+        '&token=' + encodeURIComponent(APP_CONFIG.REQUEST_TOKEN);
+      const resp = await fetch(url);
+      const data = await resp.json();
+      if (!data.ok) {
+        els.indMeta.textContent = '讀取失敗：' + (data.error || '未知錯誤');
+        return;
+      }
+      const ind = data.individual || {};
+      els.indTitle.textContent = ind.id + (ind.nickname ? '（' + ind.nickname + '）' : '');
+      els.indMeta.textContent =
+        '物種：' + (ind.species || '—') + '　·　照片數：' + (ind.photo_count || 0);
+      const photos = data.photos || [];
+      if (photos.length === 0) {
+        els.indPhotos.innerHTML = '<p class="helper-text">此個體尚無照片紀錄</p>';
+        return;
+      }
+      els.indPhotos.innerHTML = photos.map(function (p) {
+        const big = (p.thumbnail_url || '').replace(/sz=w\d+/, 'sz=w1600');
+        const thumb = p.thumbnail_url
+          ? '<img src="' + escapeHtml(p.thumbnail_url) + '" alt="" loading="lazy" data-full="' + escapeHtml(big) + '">'
+          : '<div class="ind-photo-noimg"></div>';
+        return '<div class="ind-photo">' + thumb +
+          '<div class="ind-photo-cap">' + escapeHtml(p.date || '日期未知') +
+          '　' + escapeHtml(p.side || '') + '</div></div>';
+      }).join('');
+
+      // 點個體照片放大
+      els.indPhotos.querySelectorAll('img').forEach(function (img) {
+        img.addEventListener('click', function () {
+          els.modalImg.src = img.dataset.full || img.src;
+          els.modal.classList.add('show');
+        });
+      });
+    } catch (err) {
+      console.error(err);
+      els.indMeta.textContent = '網路錯誤，請稍後再試';
+    }
+  }
+
+  els.indClose.addEventListener('click', closeIndividual);
+  els.indModal.addEventListener('click', function (e) {
+    if (e.target === els.indModal) closeIndividual();
+  });
 
   els.modalClose.addEventListener('click', function () {
     els.modal.classList.remove('show');
