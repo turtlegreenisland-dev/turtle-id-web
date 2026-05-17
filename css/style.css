@@ -485,6 +485,9 @@ main {
 
 .modal.show { display: flex; }
 
+/* 放大圖永遠蓋在個體照片視窗之上 */
+#imageModal { z-index: 1100; }
+
 .modal img {
   max-width: 100%;
   max-height: 90vh;
