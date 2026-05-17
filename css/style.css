@@ -376,6 +376,42 @@ main {
 .rank-mid  { background: #fff0d6; color: #8a5800; }
 .rank-low  { background: #ececec; color: #6c7a8b; }
 
+/* 比對結果：最相似個體 / 可能為新個體 */
+.match-box {
+  margin-top: 10px;
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--c-border);
+}
+
+.match-found { background: #e6f7ee; border-color: #b8e3c8; }
+.match-new   { background: #fff5e0; border-color: #ffe0a8; }
+.match-pending { background: var(--c-sand); color: var(--c-muted); }
+
+.match-label {
+  font-size: 0.82rem;
+  color: var(--c-muted);
+  margin-bottom: 4px;
+}
+
+.match-id {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--c-deep);
+}
+
+.match-new-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #8a5800;
+}
+
+.match-score {
+  font-size: 0.88rem;
+  color: var(--c-muted);
+  margin-top: 2px;
+}
+
 /* 模態 */
 .modal {
   position: fixed;

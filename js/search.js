@@ -1,5 +1,9 @@
 /* 查詢頁邏輯：GET 到 Apps Script 取回紀錄 */
 (function () {
+  // 比對相似度門檻：最高相似度低於此值 → 顯示「可能為新個體」。
+  // 目前 0.3 偏低（測同一隻海龜分數正常應有 0.6+），確認比對品質後再調整。
+  const SIMILARITY_THRESHOLD = 0.3;
+
   const els = {
     form: document.getElementById('searchForm'),
     name: document.getElementById('searchName'),
@@ -35,11 +39,33 @@
     return m ? parseFloat(m[1]) : NaN;
   }
 
-  function rankClass(score) {
-    if (isNaN(score)) return 'rank-low';
-    if (score >= 0.8) return 'rank-high';
-    if (score >= 0.5) return 'rank-mid';
-    return 'rank-low';
+  /** 從 "TW02G0029 (0.38)" 取出個體編號。 */
+  function parseIndividualId(rankStr) {
+    const s = String(rankStr || '');
+    const idx = s.lastIndexOf(' (');
+    return (idx >= 0 ? s.slice(0, idx) : s).trim();
+  }
+
+  /** 把一筆回報的比對結果渲染成「最相似個體」或「可能為新個體」。 */
+  function renderMatch(r) {
+    if (r.status && r.status !== '已完成') {
+      return '<div class="match-box match-pending">比對' + escapeHtml(r.status) + '</div>';
+    }
+    const top = (r.results || [])[0];
+    const score = parseScore(top);
+    if (!top || isNaN(score) || score < SIMILARITY_THRESHOLD) {
+      return '<div class="match-box match-new">' +
+        '<div class="match-new-title">可能為新個體</div>' +
+        (isNaN(score) ? '' :
+          '<div class="match-score">最高相似度 ' + score.toFixed(2) +
+          '（門檻 ' + SIMILARITY_THRESHOLD + '）</div>') +
+        '</div>';
+    }
+    return '<div class="match-box match-found">' +
+      '<div class="match-label">最相似個體</div>' +
+      '<div class="match-id">' + escapeHtml(parseIndividualId(top)) + '</div>' +
+      '<div class="match-score">相似度 ' + score.toFixed(2) + '</div>' +
+      '</div>';
   }
 
   function fmtTime(iso) {
@@ -59,10 +85,6 @@
       return;
     }
     const html = results.map(function (r) {
-      const ranks = (r.results || []).map(function (rk) {
-        const score = parseScore(rk);
-        return '<span class="rank-item ' + rankClass(score) + '">' + escapeHtml(rk) + '</span>';
-      }).join('');
       const thumb = r.thumbnail_url
         ? '<img src="' + escapeHtml(r.thumbnail_url) + '" alt="" data-full="' + escapeHtml(r.thumbnail_url.replace(/sz=w\d+/, 'sz=w1600')) + '">'
         : '<div style="height:120px;background:var(--c-sand);border-radius:6px;"></div>';
@@ -75,7 +97,7 @@
             '<span><strong>側別：</strong>' + escapeHtml(sideLabel(r.side)) + '</span>' +
             '<span class="status-tag ' + statusClass(r.status) + '">' + escapeHtml(r.status || '—') + '</span>' +
           '</div>' +
-          '<div class="rank-list">' + (ranks || '<span class="helper-text">尚無比對結果</span>') + '</div>' +
+          renderMatch(r) +
         '</div>' +
         '</div>';
     }).join('');
