@@ -117,7 +117,8 @@
     els.results.innerHTML = '';
 
     try {
-      const url = APP_CONFIG.APPS_SCRIPT_URL + '?name=' + encodeURIComponent(name);
+      const url = APP_CONFIG.APPS_SCRIPT_URL + '?name=' + encodeURIComponent(name) +
+        '&token=' + encodeURIComponent(APP_CONFIG.REQUEST_TOKEN);
       const resp = await fetch(url);
       const data = await resp.json();
       if (data.ok) {
